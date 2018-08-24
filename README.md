@@ -1,4 +1,4 @@
- #使用须知：
+ # 使用须知：
  1. verTree是一款开源的用于树菜单插件，当前版本：V1.0.1;
  2. verTree提供免费下载开发版，下载链接请见插件下载板块
  3. 使用verTree前请先修改Tree.css()方法中的css链接地址修改为项目相对路径，verTree提供给了iconfont.css和common.css，修改了链接地址后将会动态加载相关样式路径
