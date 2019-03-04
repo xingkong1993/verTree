@@ -188,7 +188,7 @@ window.verTree = (function () {
             var _self = this;
             options.forEach(function (item) {
                 item.onclick = function (e) {
-                    if (this.type == "list") {
+                    if (_self.type == "list") {
                         var level = parseInt(this.parentElement.getAttribute("data-levels"));
                         var id = (this.parentElement.parentElement.getAttribute("data-id"));
                         var data = this.parentElement.querySelector("children-jsons").innerHTML;
