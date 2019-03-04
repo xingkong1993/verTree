@@ -49,7 +49,7 @@ VERTREE.js 1.0
  |——————vericon.css icon样式
  |————verTree.js  verJS文件
  ~~~
- #五、样式实例
+ # 五、样式实例
  1. [表单样式](https://www.xincheng-blog.cn/tree.form.html)
  2. [普通样式](https://www.xincheng-blog.cn/tree.data.html)
  2. [表格样式](https://www.xincheng-blog.cn/tree-table.html)
