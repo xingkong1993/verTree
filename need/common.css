@@ -1,0 +1,58 @@
+.green {
+    color: #2ca02c;
+}
+
+.red {
+    color: #c21;
+}
+
+.blue {
+    color: #1B9AF7;
+}
+ul,li,ol{
+    list-style: none;
+}
+.tree-form-box{
+    vertical-align: top;
+    border-radius: 5px;
+    display: inline-block;
+}
+.tree-form-box .ver-tree-level-0{
+    display: inline-block;
+    vertical-align: top;
+    border: 1px solid #dedede;
+    padding: 15px;
+}
+.tree-form-box .ver-tree-level-0+.ver-tree-level-0{
+    margin-left: 5px;
+}
+i.tree-option{
+    cursor: pointer;
+}
+
+.ver-tree-levels-show{
+    display: block !important;
+}
+.ver-tree-levels-hide{
+    display: none !important;
+}
+
+.tree-list{
+    width: 100%;
+}
+
+.tree-list tbody{
+    width: 100%;
+}
+
+.tree-list tbody tr{
+    width: 100%;
+}
+
+children-jsons{
+    display: none;
+}
+
+.ver-tree-check,.ver-tree-check-all{
+    cursor: pointer;
+}
