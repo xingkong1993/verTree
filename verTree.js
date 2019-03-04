@@ -206,9 +206,8 @@ window.verTree = (function () {
                         } else {
                             this.classList.add("icon-plus");
                             this.classList.remove("icon-minus");
-                            for (var i = clss.length - 1; i >= 0; i--) {
-                                clss[i].parentNode.removeChild(clss[i]);
-                            }
+                            _self.level_tops(id);
+
                         }
                     } else {
                         // var id = parseInt(this.parentElement.parentElement.getAttribute("data-level"));
@@ -343,6 +342,17 @@ window.verTree = (function () {
                 }
             } else {
                 return false;
+            }
+        },
+        level_tops:function (id) {
+            var tops = document.querySelectorAll("[data-parent='"+id+"']");
+            if(tops.length < 1) return false;
+            for (var i = tops.length - 1; i >= 0; i--) {
+                // cls
+                var cl = tops[i],
+                    ids = cl.getAttribute("data-id");
+                cl.parentElement.removeChild(cl);
+                this.level_tops(ids);
             }
         }
     };
