@@ -1,9 +1,8 @@
-VERTREE.js 1.0
-===============
+###### VERTREE.js 1.0
 
-# 一、使用须知：
+###### 一、使用须知：
 verTree.js是树形菜单插件，集成了表单/表格树形展示，只需引入js文件即可
-# 二、方法介绍
+###### 二、方法介绍
 使用verTree.js只需在js中new一个既可以使用，如下面实例：
 ~~~
 new verTree({
@@ -23,7 +22,7 @@ new verTree({
  </thead>
 </table>
 ~~~ 
-# 三、属性说明
+###### 三、属性说明
 1. 接口参数：
     1. items:容器名称（推荐使用id，能够保证只有唯一的一个容器，填写时需要带上修饰符）
     2. type：数据展示的演示，提供三种选项：
@@ -40,7 +39,7 @@ new verTree({
     3. data-tree-changes：是否出现复选框，填写在表头tr中
     4. data-field：当前列加载的字段名称，填写在表头td/th中
     5. 更多data参数正在开放中
-# 四、文件目录结构
+###### 四、文件目录结构
 ~~~
 www 网站部署目录
 |——verJs  verjs文件夹
@@ -49,10 +48,10 @@ www 网站部署目录
 |——————treeIcon.css icon样式
 |————verTree.js  verJS文件
 ~~~
-# 五、样式实例
+###### 五、样式实例
 1. [表单样式](https://www.xincheng-blog.cn/tree.form.html)
 2. [普通样式](https://www.xincheng-blog.cn/tree.data.html)
 2. [表格样式](https://www.xincheng-blog.cn/tree-table.html)
-# 版权信息
+###### 版权信息
 > Copyright © 2019 by [搬砖的小白](https://www.xincheng-blog.cn)  
 > All rights reserved。
