@@ -1,5 +1,10 @@
 window.verTree = (function () {
     var tree = function (params) {
+        if(!ie()){
+            alert("当前浏览器不支持verTree插件！");
+            return false;
+        }
+        props;
         //加载css样式
         var path = this.getPath,
             common_css_href = path + "need/common.css?v=1.0&_=" + Math.random(),
@@ -103,9 +108,8 @@ window.verTree = (function () {
             var chas = document.createElement("th");
             this.thead.insertBefore(chas, this.thead.children[0]);
             chas.style.width = "5em";
-            var html = this.list_item(this.data, child, 0, changes);
             var tbody = document.createElement("tbody");
-            tbody.innerHTML = html;
+            var html = this.list_item(this.data, child, 0, changes,tbody,true);
             this.tree.appendChild(tbody);
             this.tree_options_list();
             this.checkInput();
@@ -113,8 +117,7 @@ window.verTree = (function () {
         /*
          * 表格数据处理
          */
-        list_item: function (info, child, level, changes, objs) {
-            var html = "";
+        list_item: function (info, child, level, changes, objs,add) {
             var l = "";
             if (level > 0) {
                 l = "|";
@@ -138,35 +141,33 @@ window.verTree = (function () {
                 if (data[this.pk] > 0) {
                     cl = " tree-parent-" + data[this.pk];
                 }
-                if (!objs) {
-                    html += "<tr class='ver-tree-levels ver-tree-level-" + level + cl + "' data-parent='" + data[this.pk] + "' data-id='" + data[this.id] + "'><td data-levels='" + level + "'>" + _h + "<children-jsons>" + childs + "</children-jsons></td>";
-                    if (changes) {
-                        html += "<td align='center'><i class='verTreeIcon icon-check-box blue ver-tree-check ver-tree-checks'></i><input type='checkbox' name='" + this.id + "[]' value='" + data[this.id] + "' style='display: none'></td>"
-                    }
-                    child.forEach(function (item) {
-                        var file = item.getAttribute("data-field");
-                        html += '<td>' + data[file] + '</td>';
-                    });
-                    html += "</tr>";
+                var te = document.createElement("tr");
+                te.className = "ver-tree-levels ver-tree-level-" + level + cl;
+                te.setAttribute("data-parent", data[this.pk]);
+                te.setAttribute("data-id", data[this.id]);
+                var lev = document.createElement("td");
+                lev.setAttribute("data-levels",level);
+                lev.innerHTML = _h+"<children-jsons>" + childs + "</children-jsons>";
+                te.appendChild(lev);
+                if (changes) {
+                    var change = document.createElement("td");
+                    change.align = "center";
+                    change.innerHTML = "<i class='verTreeIcon icon-check-box blue ver-tree-check ver-tree-checks'></i><input type='checkbox' name='" + this.id + "[]' value='" + data[this.id] + "' style='display: none'>";
+                    te.appendChild(change);
+                }
+                [].forEach.call(child,function (item) {
+                    var file = item.getAttribute("data-field");
+                    // html += '<td>' + data[file] + '</td>';
+                    var tds = document.createElement("td");
+                    tds.innerHTML = data[file];
+                    te.appendChild(tds);
+                });
+                if (add) {
+                    objs.appendChild(te);
                 } else {
-                    var te = document.createElement("tr");
-                    te.className = "ver-tree-levels ver-tree-level-" + level + cl;
-                    te.setAttribute("data-parent", data[this.pk]);
-                    te.setAttribute("data-id", data[this.id]);
-                    html = "<td data-levels='" + level + "'>" + _h + "<children-jsons>" + childs + "</children-jsons></td>";
-                    if (changes) {
-                        html += "<td align='center'><i class='verTreeIcon icon-check-box blue ver-tree-check ver-tree-checks'></i><input type='checkbox' name='" + this.id + "[]' value='" + data[this.id] + "' style='display: none'></td>"
-                    }
-                    child.forEach(function (item) {
-                        var file = item.getAttribute("data-field");
-                        html += '<td>' + data[file] + '</td>';
-                    });
-                    te.innerHTML = html;
                     sel.insertAfter(te, objs);
                 }
             }
-
-            return html;
         },
         insertAfter: function (newElement, targentElement) {
             var parent = targentElement.parentNode;
@@ -186,7 +187,7 @@ window.verTree = (function () {
             }
             var options = this.tree.querySelectorAll(".tree-option");
             var _self = this;
-            options.forEach(function (item) {
+            [].forEach.call(options,function (item) {
                 item.onclick = function (e) {
                     if (_self.type == "list") {
                         var level = parseInt(this.parentElement.getAttribute("data-levels"));
@@ -231,7 +232,7 @@ window.verTree = (function () {
         checkInput: function () {
             var inputs = this.tree.querySelectorAll(".ver-tree-checks"),
                 _self = this;
-            inputs.forEach(function (item) {
+            [].forEach.call(inputs,function (item) {
                 item.onclick = function () {
                     if (_self.type == "list") {
                         var ins = _self.tree.querySelectorAll(".ver-tree-check"),
@@ -242,7 +243,7 @@ window.verTree = (function () {
                             this.classList.remove("icon-check-box-cicre");
                             //判断是全选还是单选
                             if (this.classList.contains("ver-tree-check-all")) {
-                                ins.forEach(function (it) {
+                                [].forEach.call(ins,function (it) {
                                     it.classList.add("icon-check-box");
                                     it.classList.remove("icon-check-box-cicre");
                                     it.parentElement.querySelector("input[type=checkbox]").checked = false;
@@ -258,7 +259,7 @@ window.verTree = (function () {
                             this.classList.add("icon-check-box-cicre");
                             //判断是全选还是单选
                             if (this.classList.contains("ver-tree-check-all")) {
-                                ins.forEach(function (it) {
+                                [].forEach.call(ins,function (it) {
                                     it.classList.add("icon-check-box-cicre");
                                     it.classList.remove("icon-check-box");
                                     it.parentElement.querySelector("input[type=checkbox]").checked = true;
@@ -293,8 +294,8 @@ window.verTree = (function () {
                             this.classList.add("icon-check-box");
                             this.parentElement.querySelector("input[type=checkbox]").checked = false;
                             if (childrends.length > 0) {
-                                childrends.forEach(function (items) {
-                                    items.querySelectorAll(".ver-tree-checks").forEach(function (it) {
+                                [].forEach.call(childrends,function (items) {
+                                    [].forEach.call(items.querySelectorAll(".ver-tree-checks"),function (it) {
                                         it.classList.remove("icon-check-box-cicre");
                                         it.classList.add("icon-check-box");
                                         it.parentElement.querySelector("input[type=checkbox]").checked = false;
@@ -311,8 +312,8 @@ window.verTree = (function () {
                             }
 
                             if (childrends.length > 0) {
-                                childrends.forEach(function (items) {
-                                    items.querySelectorAll(".ver-tree-checks").forEach(function (it) {
+                                [].forEach.call(childrends,function (items) {
+                                    [].forEach.call(items.querySelectorAll(".ver-tree-checks"),function (it) {
                                         it.classList.remove("icon-check-box");
                                         it.classList.add("icon-check-box-cicre");
                                         it.parentElement.querySelector("input[type=checkbox]").checked = true;
@@ -329,7 +330,7 @@ window.verTree = (function () {
             var tops = document.querySelectorAll(".ver-tree-level-" + levels);
 
             if (tops.length > 0) {
-                tops.forEach(function (item) {
+                [].forEach.call(tops,function (item) {
                     if (item.querySelectorAll("[data-id='" + id + "']").length > 0) {
                         var icons = item.querySelector(".ver-tree-checks");
                         icons.classList.remove("icon-check-box");
@@ -355,6 +356,92 @@ window.verTree = (function () {
                 this.level_tops(ids);
             }
         }
+    };
+    //追加函数
+    var props = function () {
+        if (!Array.prototype.forEach) {
+            Array.prototype.forEach = function (callback, thisArg) {
+                var T, k;
+                if (this == null) {
+                    throw new TypeError(" this is null or not defined");
+                }
+                var O = Object(this);
+                var len = O.length >>> 0; // Hack to convert O.length to a UInt32
+                if ({}.toString.call(callback) != "[object Function]") {
+                    throw new TypeError(callback + " is not a function");
+                }
+                if (thisArg) {
+                    T = thisArg;
+                }
+                k = 0;
+                while (k < len) {
+                    var kValue;
+                    if (k in O) {
+                        kValue = O[k];
+                        callback.call(T, kValue, k, O);
+                    }
+                    k++;
+                }
+            };
+        }
+
+        if (!("classList" in document.documentElement)) {
+            Object.defineProperty(HTMLElement.prototype, 'classList', {
+                get: function () {
+                    var self = this;
+
+                    function update(fn) {
+                        return function (value) {
+                            var classes = self.className.split(/\s+/g),
+                                index = classes.indexOf(value);
+
+                            fn(classes, index, value);
+                            self.className = classes.join(" ");
+                        }
+                    }
+
+                    return {
+                        add: update(function (classes, index, value) {
+                            if (!~index) classes.push(value);
+                        }),
+
+                        remove: update(function (classes, index) {
+                            if (~index) classes.splice(index, 1);
+                        }),
+
+                        toggle: update(function (classes, index, value) {
+                            if (~index)
+                                classes.splice(index, 1);
+                            else
+                                classes.push(value);
+                        }),
+
+                        contains: function (value) {
+                            return !!~self.className.split(/\s+/g).indexOf(value);
+                        },
+
+                        item: function (i) {
+                            return self.className.split(/\s+/g)[i] || null;
+                        }
+                    };
+                }
+            });
+        }
+    }();
+
+    //判断IE版本
+    var ie = function () {
+        var DEFAULT_VERSION = 8.0;
+        var ua = navigator.userAgent.toLowerCase();
+        var isIE = ua.indexOf("msie") > -1;
+        var safariVersion;
+        if (isIE) {
+            safariVersion = ua.match(/msie ([\d.]+)/)[1];
+        }
+        if (safariVersion <= DEFAULT_VERSION) {
+            return false
+        }
+        return true;
     };
     return tree;
 })();
