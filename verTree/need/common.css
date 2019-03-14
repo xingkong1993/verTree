@@ -49,10 +49,10 @@ i.tree-option{
     width: 100%;
 }
 
-children-jsons{
-    display: none;
-}
-
 .ver-tree-check,.ver-tree-check-all{
     cursor: pointer;
+}
+
+.ver-tree-table-hide{
+    display: none;
 }

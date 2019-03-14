@@ -1,6 +1,6 @@
 window.verTree = (function () {
     var tree = function (params) {
-        if(!ie()){
+        if (!ie()) {
             alert("当前浏览器不支持verTree插件！");
             return false;
         }
@@ -109,7 +109,7 @@ window.verTree = (function () {
             this.thead.insertBefore(chas, this.thead.children[0]);
             chas.style.width = "5em";
             var tbody = document.createElement("tbody");
-            var html = this.list_item(this.data, child, 0, changes,tbody,true);
+            var html = this.list_item(this.data, child, 0, changes, tbody, true);
             this.tree.appendChild(tbody);
             this.tree_options_list();
             this.checkInput();
@@ -117,7 +117,7 @@ window.verTree = (function () {
         /*
          * 表格数据处理
          */
-        list_item: function (info, child, level, changes, objs,add) {
+        list_item: function (info, child, level, changes, objs, add, hide) {
             var l = "";
             if (level > 0) {
                 l = "|";
@@ -133,21 +133,25 @@ window.verTree = (function () {
                 if (level > 0) {
                     _h = l;
                 }
-                if (data.children.length > 0) {
+                if (data.children.length) {
                     _h += "<i class='verTreeIcon icon-plus green tree-option'></i>";
-                    childs = JSON.stringify(data.children);
+                    childs = (data.children);
                 }
                 var cl = "";
                 if (data[this.pk] > 0) {
                     cl = " tree-parent-" + data[this.pk];
                 }
                 var te = document.createElement("tr");
-                te.className = "ver-tree-levels ver-tree-level-" + level + cl;
+                var cl_te = "ver-tree-levels ver-tree-level-" + level + cl;
+                if (hide) {
+                    cl_te += " ver-tree-table-hide";
+                }
+                te.className = cl_te;
                 te.setAttribute("data-parent", data[this.pk]);
                 te.setAttribute("data-id", data[this.id]);
                 var lev = document.createElement("td");
-                lev.setAttribute("data-levels",level);
-                lev.innerHTML = _h+"<children-jsons>" + childs + "</children-jsons>";
+                lev.setAttribute("data-levels", level);
+                lev.innerHTML = _h;
                 te.appendChild(lev);
                 if (changes) {
                     var change = document.createElement("td");
@@ -155,7 +159,7 @@ window.verTree = (function () {
                     change.innerHTML = "<i class='verTreeIcon icon-check-box blue ver-tree-check ver-tree-checks'></i><input type='checkbox' name='" + this.id + "[]' value='" + data[this.id] + "' style='display: none'>";
                     te.appendChild(change);
                 }
-                [].forEach.call(child,function (item) {
+                [].forEach.call(child, function (item) {
                     var file = item.getAttribute("data-field");
                     // html += '<td>' + data[file] + '</td>';
                     var tds = document.createElement("td");
@@ -164,6 +168,10 @@ window.verTree = (function () {
                 });
                 if (add) {
                     objs.appendChild(te);
+                    if (childs.length) {
+                        var ls = level + 1;
+                        this.list_item(childs, child, ls, changes, objs, true, true);
+                    }
                 } else {
                     sel.insertAfter(te, objs);
                 }
@@ -181,29 +189,21 @@ window.verTree = (function () {
          * 收缩菜单控件
          */
         tree_options_list: function () {
-            if (this.type == "list") {
-                var child = this.thead.querySelectorAll("[data-field]");
-                var changes = this.thead.getAttribute("data-tree-changes");
-            }
             var options = this.tree.querySelectorAll(".tree-option");
             var _self = this;
-            [].forEach.call(options,function (item) {
+            [].forEach.call(options, function (item) {
                 item.onclick = function (e) {
                     if (_self.type == "list") {
                         var level = parseInt(this.parentElement.getAttribute("data-levels"));
                         var id = (this.parentElement.parentElement.getAttribute("data-id"));
-                        var data = this.parentElement.querySelector("children-jsons").innerHTML;
-                        data = JSON.parse(data);
-                        var tr = this.parentElement.parentElement;
-                        var clss = _self.tree.getElementsByClassName("tree-parent-" + id);
-                        //判断当前是否存在icon-plus
+                        var datas = this.parentElement.parentElement.parentElement.querySelectorAll("[data-parent='" + id + "']");
                         if (this.classList.contains("icon-plus")) {
-                            level = parseInt(level) + 1;
-                            _self.list_item(data, child, level, changes, tr);
                             this.classList.remove("icon-plus");
                             this.classList.add("icon-minus");
-                            _self.tree_options_list();
-                            _self.checkInput();
+                            //显示子节点
+                            [].forEach.call(datas, function (das) {
+                                das.classList.remove("ver-tree-table-hide");
+                            })
                         } else {
                             this.classList.add("icon-plus");
                             this.classList.remove("icon-minus");
@@ -213,11 +213,11 @@ window.verTree = (function () {
                     } else {
                         // var id = parseInt(this.parentElement.parentElement.getAttribute("data-level"));
                         var ul = (this.parentElement.querySelector("ul"));
-                        if(this.classList.contains("icon-plus")){
+                        if (this.classList.contains("icon-plus")) {
                             this.classList.remove("icon-plus");
                             this.classList.add("icon-minus");
                             ul.classList.remove("ver-tree-levels-hide");
-                        }else{
+                        } else {
                             this.classList.add("icon-plus");
                             this.classList.remove("icon-minus");
                             ul.classList.add("ver-tree-levels-hide");
@@ -232,7 +232,7 @@ window.verTree = (function () {
         checkInput: function () {
             var inputs = this.tree.querySelectorAll(".ver-tree-checks"),
                 _self = this;
-            [].forEach.call(inputs,function (item) {
+            [].forEach.call(inputs, function (item) {
                 item.onclick = function () {
                     if (_self.type == "list") {
                         var ins = _self.tree.querySelectorAll(".ver-tree-check"),
@@ -243,10 +243,13 @@ window.verTree = (function () {
                             this.classList.remove("icon-check-box-cicre");
                             //判断是全选还是单选
                             if (this.classList.contains("ver-tree-check-all")) {
-                                [].forEach.call(ins,function (it) {
-                                    it.classList.add("icon-check-box");
-                                    it.classList.remove("icon-check-box-cicre");
-                                    it.parentElement.querySelector("input[type=checkbox]").checked = false;
+                                [].forEach.call(ins, function (it) {
+                                    var parent = it.parentElement.parentElement;
+                                    if (!(parent.classList.contains("ver-tree-table-hide"))) {
+                                        it.classList.add("icon-check-box");
+                                        it.classList.remove("icon-check-box-cicre");
+                                        it.parentElement.querySelector("input[type=checkbox]").checked = false;
+                                    }
                                 });
                             } else {
                                 this.parentElement.querySelector("input[type=checkbox]").checked = false;
@@ -259,10 +262,13 @@ window.verTree = (function () {
                             this.classList.add("icon-check-box-cicre");
                             //判断是全选还是单选
                             if (this.classList.contains("ver-tree-check-all")) {
-                                [].forEach.call(ins,function (it) {
-                                    it.classList.add("icon-check-box-cicre");
-                                    it.classList.remove("icon-check-box");
-                                    it.parentElement.querySelector("input[type=checkbox]").checked = true;
+                                [].forEach.call(ins, function (it) {
+                                    var parent = it.parentElement.parentElement;
+                                    if (!(parent.classList.contains("ver-tree-table-hide"))) {
+                                        it.classList.add("icon-check-box-cicre");
+                                        it.classList.remove("icon-check-box");
+                                        it.parentElement.querySelector("input[type=checkbox]").checked = true;
+                                    }
                                 });
                             } else {
                                 this.parentElement.querySelector("input[type=checkbox]").checked = true;
@@ -294,8 +300,8 @@ window.verTree = (function () {
                             this.classList.add("icon-check-box");
                             this.parentElement.querySelector("input[type=checkbox]").checked = false;
                             if (childrends.length > 0) {
-                                [].forEach.call(childrends,function (items) {
-                                    [].forEach.call(items.querySelectorAll(".ver-tree-checks"),function (it) {
+                                [].forEach.call(childrends, function (items) {
+                                    [].forEach.call(items.querySelectorAll(".ver-tree-checks"), function (it) {
                                         it.classList.remove("icon-check-box-cicre");
                                         it.classList.add("icon-check-box");
                                         it.parentElement.querySelector("input[type=checkbox]").checked = false;
@@ -312,8 +318,8 @@ window.verTree = (function () {
                             }
 
                             if (childrends.length > 0) {
-                                [].forEach.call(childrends,function (items) {
-                                    [].forEach.call(items.querySelectorAll(".ver-tree-checks"),function (it) {
+                                [].forEach.call(childrends, function (items) {
+                                    [].forEach.call(items.querySelectorAll(".ver-tree-checks"), function (it) {
                                         it.classList.remove("icon-check-box");
                                         it.classList.add("icon-check-box-cicre");
                                         it.parentElement.querySelector("input[type=checkbox]").checked = true;
@@ -330,7 +336,7 @@ window.verTree = (function () {
             var tops = document.querySelectorAll(".ver-tree-level-" + levels);
 
             if (tops.length > 0) {
-                [].forEach.call(tops,function (item) {
+                [].forEach.call(tops, function (item) {
                     if (item.querySelectorAll("[data-id='" + id + "']").length > 0) {
                         var icons = item.querySelector(".ver-tree-checks");
                         icons.classList.remove("icon-check-box");
@@ -345,14 +351,19 @@ window.verTree = (function () {
                 return false;
             }
         },
-        level_tops:function (id) {
-            var tops = document.querySelectorAll("[data-parent='"+id+"']");
-            if(tops.length < 1) return false;
+        level_tops: function (id) {
+            var tops = document.querySelectorAll("[data-parent='" + id + "']");
+            if (tops.length < 1) return false;
             for (var i = tops.length - 1; i >= 0; i--) {
                 // cls
                 var cl = tops[i],
                     ids = cl.getAttribute("data-id");
-                cl.parentElement.removeChild(cl);
+                cl.classList.add("ver-tree-table-hide");
+                var verTreeIcon
+                if (verTreeIcon = cl.querySelector(".verTreeIcon ")) {
+                    verTreeIcon.classList.remove("icon-minus");
+                    verTreeIcon.classList.add("icon-plus");
+                }
                 this.level_tops(ids);
             }
         }
