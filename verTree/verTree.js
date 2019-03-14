@@ -63,14 +63,14 @@ window.verTree = (function () {
             }
             this.tree_options_list();
         },
-        tree_data: function (data, level, cl) {
+        tree_data: function (data, level, cl,hidde) {
             var ul = document.createElement("ul");
             var f = level + 1;
             var icons = icon = "";
             for (var i in data) {
                 var d = data[i];
                 if (d.children.length > 0) {
-                    icon = "<i class='verTreeIcon icon-minus green tree-option'></i>";
+                    icon = "<i class='verTreeIcon icon-plus green tree-option'></i>";
                 }
 
                 if (this.type == "form") {
@@ -82,6 +82,9 @@ window.verTree = (function () {
                 li.setAttribute("data-level", level);
                 li.innerHTML = icon + icons + d[this.name];
                 li.className = "ver-tree-levels ver-tree-level-" + level + " tree-parent-" + d[this.pk];
+                if(hidde){
+                    ul.classList.add("ver-tree-levels-hide");
+                }
                 ul.appendChild(li);
                 if (cl) {
                     cl.appendChild(ul);
@@ -89,7 +92,7 @@ window.verTree = (function () {
                     this.tree.appendChild(ul);
                 }
                 if (d.children.length > 0) {
-                    this.tree_data(d.children, f, li);
+                    this.tree_data(d.children, f, li,true);
                 }
             }
         },
@@ -244,12 +247,12 @@ window.verTree = (function () {
                             //判断是全选还是单选
                             if (this.classList.contains("ver-tree-check-all")) {
                                 [].forEach.call(ins, function (it) {
-                                    var parent = it.parentElement.parentElement;
-                                    if (!(parent.classList.contains("ver-tree-table-hide"))) {
+                                    // var parent = it.parentElement.parentElement;
+                                    // if (!(parent.classList.contains("ver-tree-table-hide"))) {
                                         it.classList.add("icon-check-box");
                                         it.classList.remove("icon-check-box-cicre");
                                         it.parentElement.querySelector("input[type=checkbox]").checked = false;
-                                    }
+                                    // }
                                 });
                             } else {
                                 this.parentElement.querySelector("input[type=checkbox]").checked = false;
