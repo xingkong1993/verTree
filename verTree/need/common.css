@@ -56,3 +56,7 @@ i.tree-option{
 .ver-tree-table-hide{
     display: none;
 }
+
+.ver-tree-levels ul{
+    padding:0 15px !important;
+}

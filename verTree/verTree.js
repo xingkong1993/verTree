@@ -25,7 +25,10 @@ window.verTree = (function () {
         this.option = params.option ? params.option : "";
         this.pk = params.parent ? params.parent : "parent";
         this.id = params.params ? params.params : "id";
-        this.name = params.name ? params.name : "name";
+        this.value = params.value ? params.value : "name";
+        this.name = params.name ? params.name : this.id;
+        this.defaults = params.defaults ? params.defaults : [];
+        this.open_close = params.open_close ? params.open_close : "close";
         switch (this.type) {
             case "list":
                 this.thead = (this.tree).querySelector('[data-tree-list="true"]');
@@ -63,28 +66,38 @@ window.verTree = (function () {
             }
             this.tree_options_list();
         },
-        tree_data: function (data, level, cl,hidde) {
+        tree_data: function (data, level, cl) {
             var ul = document.createElement("ul");
+            // console.log(this.defaults);
             var f = level + 1;
             var icons = icon = "";
             for (var i in data) {
                 var d = data[i];
-                if (d.children.length > 0) {
-                    icon = "<i class='verTreeIcon icon-plus green tree-option'></i>";
+                var i_className = "icon-plus";
+                if (this.open_close != "open" && level>0) {
+                    ul.classList.add("ver-tree-levels-hide");
+                } else {
+                    i_className = "icon-minus";
                 }
-
+                if (d.children.length > 0) {
+                    icon = "<i class='verTreeIcon " + i_className + " green tree-option'></i>";
+                }
+                var icons_class = "icon-check-box";
+                var checkboxs = "";
+                if (this.defaults.length && this.defaults.indexOf(d[this.id].toString()) >= 0) {
+                    icons_class = "icon-check-box-cicre";
+                    checkboxs = "checked='checked'";
+                }
                 if (this.type == "form") {
-                    icons = "<span><i class='verTreeIcon icon-check-box blue ver-tree-check ver-tree-checks'></i><input type='checkbox' name='" + this.id + "[]' value='" + d[this.id] + "' style='display: none'></span> "
+                    icons = "<span><i class='verTreeIcon " + icons_class + " blue ver-tree-check ver-tree-checks'></i><input type='checkbox' name='" + this.name + "[" + level + "][]' value='" + d[this.id] + "' style='display: none' " + checkboxs + "></span> "
                 }
                 var li = document.createElement("li");
                 li.setAttribute("data-parent", d[this.pk]);
                 li.setAttribute("data-id", d[this.id]);
                 li.setAttribute("data-level", level);
-                li.innerHTML = icon + icons + d[this.name];
+                li.innerHTML = icon + icons + d[this.value];
                 li.className = "ver-tree-levels ver-tree-level-" + level + " tree-parent-" + d[this.pk];
-                if(hidde){
-                    ul.classList.add("ver-tree-levels-hide");
-                }
+
                 ul.appendChild(li);
                 if (cl) {
                     cl.appendChild(ul);
@@ -92,7 +105,7 @@ window.verTree = (function () {
                     this.tree.appendChild(ul);
                 }
                 if (d.children.length > 0) {
-                    this.tree_data(d.children, f, li,true);
+                    this.tree_data(d.children, f, li);
                 }
             }
         },
@@ -105,12 +118,11 @@ window.verTree = (function () {
             if (changes) {
                 var cha = document.createElement("th");
                 cha.innerHTML = "<i class='verTreeIcon icon-check-box blue ver-tree-check-all ver-tree-checks'></i>";
-                cha.width = 30;
                 this.thead.insertBefore(cha, this.thead.children[0])
             }
-            var chas = document.createElement("th");
-            this.thead.insertBefore(chas, this.thead.children[0]);
-            chas.style.width = "5em";
+            // var chas = document.createElement("th");
+            // this.thead.insertBefore(chas, this.thead.children[0]);
+            // chas.style.width = "220";
             var tbody = document.createElement("tbody");
             var html = this.list_item(this.data, child, 0, changes, tbody, true);
             this.tree.appendChild(tbody);
@@ -152,23 +164,32 @@ window.verTree = (function () {
                 te.className = cl_te;
                 te.setAttribute("data-parent", data[this.pk]);
                 te.setAttribute("data-id", data[this.id]);
-                var lev = document.createElement("td");
-                lev.setAttribute("data-levels", level);
-                lev.innerHTML = _h;
-                te.appendChild(lev);
                 if (changes) {
                     var change = document.createElement("td");
                     change.align = "center";
-                    change.innerHTML = "<i class='verTreeIcon icon-check-box blue ver-tree-check ver-tree-checks'></i><input type='checkbox' name='" + this.id + "[]' value='" + data[this.id] + "' style='display: none'>";
+                    change.innerHTML = "<i class='verTreeIcon icon-check-box blue ver-tree-check ver-tree-checks'></i><input type='checkbox' name='" + this.name + "[]' value='" + data[this.id] + "' style='display: none'>";
                     te.appendChild(change);
                 }
-                [].forEach.call(child, function (item) {
+                // console.log(child);
+                [].forEach.call(child, function (item,c) {
                     var file = item.getAttribute("data-field");
                     // html += '<td>' + data[file] + '</td>';
                     var tds = document.createElement("td");
-                    tds.innerHTML = data[file];
+                    var _tds = data[file];
+                    if(c == 0){
+                        tds.setAttribute("data-levels", level);
+                        _tds = _h + " "+_tds
+                    }
+                    if (item.getAttribute("data-style")) {
+                        tds.style = item.getAttribute("data-style");
+                    }
+                    tds.innerHTML = _tds;
                     te.appendChild(tds);
                 });
+                // var first_td = te.querySelector("td");
+                // if(td.querySelector(".verTreeIcon"))
+                // first_td.setAttribute("data-levels", level);
+                // first_td.innerHTML = _h +" "+ first_td.innerHTML;
                 if (add) {
                     objs.appendChild(te);
                     if (childs.length) {
@@ -249,9 +270,9 @@ window.verTree = (function () {
                                 [].forEach.call(ins, function (it) {
                                     // var parent = it.parentElement.parentElement;
                                     // if (!(parent.classList.contains("ver-tree-table-hide"))) {
-                                        it.classList.add("icon-check-box");
-                                        it.classList.remove("icon-check-box-cicre");
-                                        it.parentElement.querySelector("input[type=checkbox]").checked = false;
+                                    it.classList.add("icon-check-box");
+                                    it.classList.remove("icon-check-box-cicre");
+                                    it.parentElement.querySelector("input[type=checkbox]").checked = false;
                                     // }
                                 });
                             } else {

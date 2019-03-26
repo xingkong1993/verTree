@@ -32,13 +32,16 @@ new verTree({
     3. data：原始json数组数据，在数据中必须包含children字段，否则数据树将无法识别
     4. parent: 父级节点字段名称，默认为parent
     5. params：当前节点主键字段名称，默认为id，
-    6. value：当type不等于table时页面展示的字段名称，默认为name
+    6. value：当type不等于table时页面展示的字段名称，默认为name,
+    7. name: 组件需要传输的input选择框的name键值，默认为params参数值，
+    8. open_close：是否展开子节点，默认为close，需要展示更改为open，
+    9. defaults：选中参数回显，数据为params键值中的数据
 2. data参数
     1. 说明：data参数主要用于当type等于table时在表格中添加的相关data参数
     2. data-tree-list: 加载的字段集合数据列表，填写表头tr中
     3. data-tree-changes：是否出现复选框，填写在表头tr中
     4. data-field：当前列加载的字段名称，填写在表头td/th中
-    5. 更多data参数正在开放中
+    5. data-style: 表格css样式梳理
 ###### 四、文件目录结构
 ~~~
 www 网站部署目录
